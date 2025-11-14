@@ -9,6 +9,7 @@ def updateDomain(old,new):
             result = supabase.table('Domain_table').select('domain_name').eq('domain_name', old).execute()
             if len(result.data)>0:
                 supabase.table('Domain_table').update({'domain_name':new, 'is_valid':'not verified'}).eq('domain_name',old).execute()
+                return f"{old} => {new}"
             else:    
                 return f"{old} is not  part of the db"
         else:   

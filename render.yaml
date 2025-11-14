@@ -1,13 +1,19 @@
 services:
   - type: web
-    name: DomWatch # Or whatever you named your service
+    name: DomWatch
     env: python
     buildCommand: pip install -r requirements.txt && apt-get update && apt-get install -y chromium-browser
     startCommand: gunicorn app:app
-    # Add your environment variables here if needed
     envVars:
       - key: SENDER_EMAIL
-        value: your_sender_email@example.com
+        type: secret
+        name: domwatch_sender_email_secret
       - key: SENDER_PASSWORD
-        value: your_app_password
-      # Add other environment variables like Supabase keys here
+        type: secret
+        name: domwatch_sender_password_secret
+      - key: SUPABASE_URL
+        type: secret
+        name: domwatch_supabase_url_secret
+      - key: SUPABASE_KEY
+        type: secret
+        name: domwatch_supabase_key_secret
