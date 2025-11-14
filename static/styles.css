@@ -1,0 +1,146 @@
+body {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  padding: 0;
+  margin: 0;
+  background-color: #221c69;
+  color: #fff;
+}
+
+h1 {
+  color: #ffffff;
+  text-align: center;
+  font-size: 3rem;
+  letter-spacing: 2px;
+  text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
+  border-bottom: 2px solid #00ffff;
+  padding-bottom: 10px;
+  margin: 30px auto;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.content h2 {
+  color: #ffffff;
+  text-align: left;
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
+  padding-bottom: 10px;
+  margin: 30px 50px;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+.content ul {
+  margin: 30px 50px;
+}
+.content a {
+  color: #00ffff;
+  text-decoration: none;
+}
+.content .home_btn {
+  border: 1px solid #00ffff;
+  color: #00ffff;
+  margin: 15px 30px;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 6px;
+  display: inline-block;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.08s ease;
+}
+.content .home_btn:hover {
+  background: rgba(0, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+.content .home_btn:active {
+  transform: translateY(0);
+}
+.content .add_btn {
+  border: 1px solid #27e31a;
+  color: #27e31a;
+  margin: 15px 30px;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 6px;
+  display: inline-block;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.08s ease;
+}
+.content .add_btn:hover {
+  background: rgba(0, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+.content .add_btn:active {
+  transform: translateY(0);
+}
+.content .update_btn {
+  border: 1px solid #eaed09;
+  color: #eaed09;
+  margin: 15px 30px;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 6px;
+  display: inline-block;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.08s ease;
+}
+.content .update_btn:hover {
+  background: rgba(0, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+.content .update_btn:active {
+  transform: translateY(0);
+}
+.content .delete_btn {
+  border: 1px solid #ed2009;
+  color: #ed2009;
+  margin: 15px 30px;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 6px;
+  display: inline-block;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.08s ease;
+}
+.content .delete_btn:hover {
+  background: rgba(0, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+.content .delete_btn:active {
+  transform: translateY(0);
+}
+.content .fetch_btn {
+  border: 1px solid rgba(241, 139, 6, 0.968627451);
+  color: rgba(241, 139, 6, 0.968627451);
+  margin: 15px 30px;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 6px;
+  display: inline-block;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.08s ease;
+}
+.content .fetch_btn:hover {
+  background: rgba(0, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+.content .fetch_btn:active {
+  transform: translateY(0);
+}
+.content input {
+  margin: 30px 50px;
+}
+.content .user_input {
+  width: 400px;
+  height: 40px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+.content .response {
+  margin: 0 50px;
+  font-size: 1.5rem;
+}
+
+.links:hover {
+  color: rgba(6, 241, 159, 0.968627451);
+}/*# sourceMappingURL=styles.css.map */

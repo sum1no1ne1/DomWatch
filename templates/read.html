@@ -1,0 +1,40 @@
+{% extends 'base.html' %} {% block head %} {% endblock %} {% block body %}
+<div class="content">
+  <div class="header">
+    <a class="home_btn" href="{{url_for('home')}}">home</a>
+    <h1>Read Domain</h1>
+    <div class="subheader">
+      <h2>List of domains:</h2>
+    </div>
+
+    {% if data %} {% for d in data %}
+    <table>
+      <tr>
+        <th>ID:</th>
+        <td>{{ d.id }}</td>
+      </tr>
+      <tr>
+        <th>Created at:</th>
+        <td>{{ d.created_at }}</td>
+      </tr>
+      <tr>
+        <th>Domain:</th>
+        <td>{{ d.domain_name }}</td>
+      </tr>
+      <tr>
+        <th>is Valid:</th>
+        <td>{{ d.is_valid }}</td>
+      </tr>
+      <tr>
+        ***********************************************************************************************************************************
+      </tr>
+    </table>
+    <br />
+    <br />
+    {% endfor %} {% else %}
+    <p>No domains found in the database or an error occurred.</p>
+    {% endif %}
+  </div>
+
+  {% endblock %}
+</div>

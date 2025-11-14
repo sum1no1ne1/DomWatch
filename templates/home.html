@@ -1,0 +1,35 @@
+{% extends 'base.html'%} {% block head %}{% endblock %} {% block body %}
+<div class="content">
+  <div class="header">
+    <h1>DomainWatch</h1>
+  </div>
+  <div class="subheader">
+    <h2>Choice of operations:</h2>
+  </div>
+  <ul>
+    <li>
+      <a class="links" href="{{ url_for('add') }}"><h4>Add Domain name</h4></a>
+    </li>
+    <li>
+      <a class="links" href="{{ url_for('read') }}"
+        ><h4>Read Domain name</h4></a
+      >
+    </li>
+    <li>
+      <a class="links" href="{{ url_for('update') }}"
+        ><h4>Update Domain name</h4></a
+      >
+    </li>
+    <li>
+      <a class="links" href="{{ url_for('delete') }}"
+        ><h4>Delete Domain name</h4></a
+      >
+    </li>
+    <li>
+      <a class="links" href="{{ url_for('fetch') }}"
+        ><h4>Send working Domains</h4></a
+      >
+    </li>
+  </ul>
+</div>
+{%endblock%}
