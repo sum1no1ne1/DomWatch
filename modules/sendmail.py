@@ -18,7 +18,7 @@ def sendemail(wmail, nwmail):
         msg = EmailMessage()
         msg['Subject'] = 'List of Working Domains'
         msg['From'] = SENDER_EMAIL
-        msg['To'] = 'denverfds@gmail.com'
+        msg['To'] = ['denverfds@gmail.com','shanicefdes14@gmail.com','bhaveshdeshmukh17@gmail.com']
 
 
         working_list = [item["domain_name"] for item in wmail]
