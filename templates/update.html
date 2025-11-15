@@ -1,0 +1,43 @@
+{% extends 'base.html' %} {% block head %}{% endblock %} {% block body %}
+<div class="content">
+  <div class="header">
+    <a class="home_btn" href="{{url_for('home')}}">home</a>
+    <h1>Update Domain</h1>
+  </div>
+  <div class="subheader">
+    <h2>
+      Enter the name of an existing Domain and the changes you want to make.
+    </h2>
+  </div>
+  <div class="content">
+    <form method="post">
+      <input
+        type="text"
+        class="user_input"
+        name="old_content"
+        id="old_content"
+        placeholder="old domain name"
+      />
+      <input
+        type="text"
+        class="user_input"
+        name="new_content"
+        id="new_content"
+        placeholder="new domain name"
+      />
+      <br />
+      <input type="submit" value="update" class="update_btn" />
+    </form>
+    <div class="response">
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <div class="flash-messages">
+        {% for msg in messages %}
+        <p>{{ msg }}</p>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+    </div>
+  </div>
+
+  {%endblock%}
+</div>
