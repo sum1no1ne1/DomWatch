@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: DomWatch
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SENDER_EMAIL
+        sync: false
+      - key: SENDER_PASSWORD
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
