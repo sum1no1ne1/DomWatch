@@ -12,9 +12,33 @@ def take_screenshot(domain):
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--remote-debugging-port=9222")
     
-    # **** IMPORTANT: Add this line to specify the Chromium binary location on Render ****
-    chrome_options.add_argument("--binary-location=/usr/bin/chromium-browser")
+    # Try different possible Chrome/Chromium binary locations
+    possible_paths = [
+        "/usr/bin/chromium-browser",  # Common on Debian/Ubuntu
+        "/usr/bin/chromium",          # Alternative location
+        "/usr/bin/google-chrome",     # Google Chrome on Linux
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",  # macOS
+        "C:/Program Files/Google/Chrome/Application/chrome.exe",         # Windows
+        "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"    # Windows (32-bit)
+    ]
+    
+    # Find the first available Chrome binary
+    chrome_binary_path = None
+    for path in possible_paths:
+        if os.path.exists(path):
+            chrome_binary_path = path
+            break
+    
+    # If no binary found, raise an error
+    if chrome_binary_path:
+        chrome_options.binary_location = chrome_binary_path
+    else:
+        # If running in a container environment like Render, try without specifying
+        # Or install chromium-browser first
+        pass
     
     # Create a Service object using ChromeDriverManager
     # This ensures the correct driver executable is found and managed
