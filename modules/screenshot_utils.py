@@ -13,12 +13,12 @@ def take_screenshot(domain):
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--window-size=1920,1080")
     
     # Try different possible Chrome/Chromium binary locations
     possible_paths = [
-        "/usr/bin/chromium-browser",  # Common on Debian/Ubuntu
-        "/usr/bin/chromium",          # Alternative location
+        "/usr/bin/chromium-browser",  # Render and Debian/Ubuntu
+        "/usr/bin/chromium",          # Alternative location on Linux
         "/usr/bin/google-chrome",     # Google Chrome on Linux
         "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",  # macOS
         "C:/Program Files/Google/Chrome/Application/chrome.exe",         # Windows
@@ -32,12 +32,12 @@ def take_screenshot(domain):
             chrome_binary_path = path
             break
     
-    # If no binary found, raise an error
+    # Set the binary location if found
     if chrome_binary_path:
         chrome_options.binary_location = chrome_binary_path
     else:
-        # If running in a container environment like Render, try without specifying
-        # Or install chromium-browser first
+        # On some systems, Chrome might be in PATH - don't set binary_location
+        # This allows the system to find Chrome automatically
         pass
     
     # Create a Service object using ChromeDriverManager
@@ -56,7 +56,6 @@ def take_screenshot(domain):
             url_to_open = domain
             
         driver.get(url_to_open)
-        driver.set_window_size(1920, 1080)
         
         # Create a safe filename for the screenshot
         safe_name = "".join(c for c in domain if c.isalnum() or c in "._-")
