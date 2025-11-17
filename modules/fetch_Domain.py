@@ -1,60 +1,72 @@
 import os
-from .config import supabase
-from .screenshot_utils import  take_screenshot
-from .domain_utils import is_domain_valid_https
-from .sendmail import sendemail
-from .createpdf import pdfcreate
 import shutil
+from .config import supabase
+from .screenshot_utils import take_screenshot
+from .createpdf import pdfcreate
+from .sendmail import sendemail
+from .domain_utils import is_domain_valid_https
+
+BATCH_SIZE = 5  # Adjust based on memory capacity
 
 def fetchDomain():
     print("Starting domain verification process...")
     try:
+        # Get domains that are 'not verified'
         result = supabase.table('Domain_table').select('id', 'domain_name').eq('is_valid', 'not verified').execute()
         domains_to_check = result.data
-
         print(f"Found {len(domains_to_check)} domains to check.")
+
+        # Verify HTTPS & update DB
         for entry in domains_to_check:
             domain_id = entry['id']
             domain_name = entry['domain_name']
             print(f"Checking: {domain_name}")
 
             if is_domain_valid_https(domain_name):
-                print(f"   - {domain_name} is valid (HTTPS + valid SSL + reachable).")
+                print(f"   - {domain_name} is valid.")
                 supabase.table('Domain_table').update({'is_valid': 'is working'}).eq('id', domain_id).execute()
             else:
                 print(f"   - {domain_name} is NOT valid.")
                 supabase.table('Domain_table').update({'is_valid': 'not working'}).eq('id', domain_id).execute()
 
-        result_working = supabase.table('Domain_table').select('domain_name').eq('is_valid', 'is working').execute()
-        result_not_working = supabase.table('Domain_table').select('domain_name').eq('is_valid', 'not working').execute()
-        working_domains = result_working.data
-        not_working_domains= result_not_working.data
+        # Fetch working / not working domains
+        working_domains = supabase.table('Domain_table').select('domain_name').eq('is_valid', 'is working').execute().data
+        not_working_domains = supabase.table('Domain_table').select('domain_name').eq('is_valid', 'not working').execute().data
 
+        # Create screenshots folder
         dir_path = "screenshots"
-
-        if os.path.exists(dir_path) and os.path.isdir(dir_path):
+        if os.path.exists(dir_path):
             shutil.rmtree(dir_path)
-        
         os.makedirs(dir_path, exist_ok=True)
 
-        print(f"Found {len(working_domains)} domains marked as 'is working'. Taking screenshots...")
-        for entry in working_domains:
-            domain_name = entry['domain_name']
-            take_screenshot_result = take_screenshot(domain_name) 
-            print(take_screenshot_result) 
+        print(f"Processing {len(working_domains)} working domains in batches...")
 
-        print(f'screenshots found at location: {dir_path} \n proceeding to create a pdf')
-        pdf_result = pdfcreate() 
-        print(pdf_result) 
+        # Batch processing
+        for i in range(0, len(working_domains), BATCH_SIZE):
+            batch = working_domains[i:i+BATCH_SIZE]
+            print(f"Processing batch {i//BATCH_SIZE + 1}: {[d['domain_name'] for d in batch]}")
 
-        print("sending pdf to required users.")
-        email_result = sendemail(working_domains,not_working_domains) 
-        print(email_result) 
+            for entry in batch:
+                domain_name = entry['domain_name']
+                print(take_screenshot(domain_name))
 
-        print("Process completed.")
-        return "Domain verification, screenshot capture, PDF creation, and email sending completed successfully!"
+            # Create PDF for this batch
+            pdf_result = pdfcreate()
+            print(pdf_result)
+
+            # Optionally send email per batch
+            email_result = sendemail(batch, not_working_domains)
+            print(email_result)
+
+            # Clear screenshots to free memory
+            for f in os.listdir(dir_path):
+                if f.endswith(".png") or f.endswith(".pdf"):
+                    os.remove(os.path.join(dir_path, f))
+
+        print("Domain verification, screenshot capture, PDF creation, and email sending completed successfully!")
+        return "Process completed successfully."
 
     except Exception as e:
-        error_message = f"An error occurred during the fetch process: {str(e)}"
-        print(error_message) 
+        error_message = f"An error occurred during the fetch process: {e}"
+        print(error_message)
         return error_message
