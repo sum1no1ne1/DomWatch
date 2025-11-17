@@ -1,11 +1,12 @@
 services:
   - type: web
     name: DomWatch
-    env: docker
-    dockerfilePath: Dockerfile
+    env: python
+    buildCommand: bash render-build.sh # Use your custom build script
+    startCommand: |
+      export PATH="${PATH}:/opt/render/project/.render/chrome/opt/google/chrome:/opt/render/project/.render/chromedriver" && \
+      gunicorn app:app
     envVars:
-      - key: PORT
-        value: 10000
       - key: SENDER_EMAIL
         type: secret
         name: domwatch_sender_email_secret
