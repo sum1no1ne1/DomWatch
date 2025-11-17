@@ -4,7 +4,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from urllib.parse import urlparse
-from webdriver_manager.chrome import ChromeDriverManager
 
 def take_screenshot(domain):
     # Configure Chrome options
@@ -12,12 +11,14 @@ def take_screenshot(domain):
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
     
-    # Updated binary location for Docker Chromium
+    # Set binary location for Docker Chromium
     chrome_options.binary_location = "/usr/bin/chromium"
     
-    # Create a Service object using ChromeDriverManager
-    service = Service(ChromeDriverManager().install())
+    # Use system chromium-driver (installed via apt-get in Dockerfile)
+    service = Service("/usr/bin/chromedriver")
 
     # Pass the service object to webdriver.Chrome
     driver = webdriver.Chrome(service=service, options=chrome_options)
