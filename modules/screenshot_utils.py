@@ -14,11 +14,11 @@ def take_screenshot(domain):
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
     
-    # Set binary location for Docker Chromium
-    chrome_options.binary_location = "/usr/bin/chromium"
+    # Set binary location for Google Chrome (installed in Dockerfile)
+    chrome_options.binary_location = "/usr/bin/google-chrome-stable"
     
-    # Use system chromium-driver (installed via apt-get in Dockerfile)
-    service = Service("/usr/bin/chromedriver")
+    # Use ChromeDriver installed in /usr/local/bin/
+    service = Service("/usr/local/bin/chromedriver")
 
     # Pass the service object to webdriver.Chrome
     driver = webdriver.Chrome(service=service, options=chrome_options)
