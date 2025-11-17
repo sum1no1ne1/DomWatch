@@ -1,10 +1,11 @@
 services:
   - type: web
     name: DomWatch
-    env: python
-    buildCommand: pip install -r requirements.txt && apt-get update && apt-get install -y chromium-browser
-    startCommand: gunicorn app:app
+    env: docker
+    dockerfilePath: Dockerfile
     envVars:
+      - key: PORT
+        value: 10000
       - key: SENDER_EMAIL
         type: secret
         name: domwatch_sender_email_secret

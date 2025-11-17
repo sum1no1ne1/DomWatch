@@ -1,10 +1,9 @@
 import os
-import shutil # Import shutil if you plan to use it later (e.g., for cleanup)
+import shutil
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service  # Import Service
+from selenium.webdriver.chrome.service import Service
 from urllib.parse import urlparse
-from webdriver_manager.chrome import ChromeDriverManager # Import ChromeDriverManager
 
 def take_screenshot(domain):
     # Configure Chrome options
@@ -14,35 +13,13 @@ def take_screenshot(domain):
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--single-process")
     
-    # Try different possible Chrome/Chromium binary locations
-    possible_paths = [
-        "/usr/bin/chromium-browser",  # Render and Debian/Ubuntu
-        "/usr/bin/chromium",          # Alternative location on Linux
-        "/usr/bin/google-chrome",     # Google Chrome on Linux
-        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",  # macOS
-        "C:/Program Files/Google/Chrome/Application/chrome.exe",         # Windows
-        "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"    # Windows (32-bit)
-    ]
+    # Chrome is installed in the Docker image
+    chrome_options.binary_location = "/usr/bin/google-chrome"
     
-    # Find the first available Chrome binary
-    chrome_binary_path = None
-    for path in possible_paths:
-        if os.path.exists(path):
-            chrome_binary_path = path
-            break
-    
-    # Set the binary location if found
-    if chrome_binary_path:
-        chrome_options.binary_location = chrome_binary_path
-    else:
-        # On some systems, Chrome might be in PATH - don't set binary_location
-        # This allows the system to find Chrome automatically
-        pass
-    
-    # Create a Service object using ChromeDriverManager
-    # This ensures the correct driver executable is found and managed
-    service = Service(ChromeDriverManager().install())
+    # Create a Service object for chromedriver
+    service = Service("/usr/local/bin/chromedriver")
 
     # Pass the service object to webdriver.Chrome
     driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -73,8 +50,3 @@ def take_screenshot(domain):
         # Ensure the driver session is properly closed
         if driver:
             driver.quit()
-
-# Example usage (uncomment if running this script directly)
-# if __name__ == "__main__":
-#     result = take_screenshot("example.com")
-#     print(result)
