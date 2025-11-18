@@ -3,57 +3,41 @@ import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
 
-load_dotenv()   # Load .env both locally & on Render
+load_dotenv()
 
-# Read environment variables
-SENDER_EMAIL = os.getenv("SENDER_EMAIL")
-SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
+SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD")
+FOLDER_PATH = "screenshots"
+PDF_NAME = "output.pdf"
 
-folder_path = "screenshots"
-
-def sendemail(wmail, nwmail):
+def sendemail(working_domains, not_working_domains):
     try:
-        # Login to SMTP
+        pdf_path = os.path.join(FOLDER_PATH, PDF_NAME)
+        if not os.path.exists(pdf_path):
+            return "PDF not found. Nothing to send."
+
+        # Compose email
+        msg = EmailMessage()
+        msg['Subject'] = 'Domain Verification Results'
+        msg['From'] = SENDER_EMAIL
+        msg['To'] = ['denverfds@gmail.com']  # Replace with actual recipients
+
+        body = "This PDF contains screenshots of all working domains.\n\n"
+        body += "List of Working Domains:\n" + "\n".join([d["domain_name"] for d in working_domains]) + "\n\n"
+        body += "List of Not Working Domains:\n" + "\n".join([d["domain_name"] for d in not_working_domains])
+        msg.set_content(body)
+
+        # Attach the PDF
+        with open(pdf_path, "rb") as f:
+            msg.add_attachment(f.read(), maintype="application", subtype="pdf", filename=PDF_NAME)
+
+        # Send the email
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
             smtp.login(SENDER_EMAIL, SENDER_PASSWORD)
-
-            msg = EmailMessage()
-            msg['Subject'] = 'List of Working Domains'
-            msg['From'] = SENDER_EMAIL
-            
-            # You can keep these static OR move them to .env later
-            msg['To'] = [
-                'denverfds@gmail.com',
-                'shanicefdes14@gmail.com',
-                'bhaveshdeshmukh17@gmail.com'
-            ]
-
-            # Convert domain dicts → lists
-            working_list = [item["domain_name"] for item in wmail]
-            not_working_list = [item["domain_name"] for item in nwmail]
-
-            # Email body
-            body = "This PDF contains images of the domains that are working.\n\n"
-            body += "List of Working Domains:\n" + "\n".join(working_list) + "\n\n"
-            body += "List of Not Working Domains:\n" + "\n".join(not_working_list) + "\n"
-
-            msg.set_content(body)
-
-            # Attach PDFs from screenshots folder
-            if os.path.exists(folder_path):
-                for filename in os.listdir(folder_path):
-                    if filename.lower().endswith(".pdf"):
-                        file_path = os.path.join(folder_path, filename)
-                        with open(file_path, "rb") as f:
-                            msg.add_attachment(
-                                f.read(),
-                                maintype="application",
-                                subtype="pdf",
-                                filename=filename
-                            )
-
             smtp.send_message(msg)
-            return "Email sent successfully!"
+
+        return "Email sent successfully with all screenshots."
 
     except Exception as e:
         return f"Failed to send email: {e}"
+
