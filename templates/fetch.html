@@ -21,6 +21,36 @@
       </div>
       {% endif %} {% endwith %}
     </div>
+
+    {% if results %}
+    <!-- Working Domains Section -->
+    <div class="results-section">
+      <h3>Working Domains:</h3>
+      {% if results.working_domains %}
+      <ul class="working-domains">
+        {% for domain in results.working_domains %}
+        <li>{{ domain }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No working domains found.</p>
+      {% endif %}
+    </div>
+
+    <!-- Not Working Domains Section -->
+    <div class="results-section">
+      <h3>Not Working Domains:</h3>
+      {% if results.not_working_domains %}
+      <ul class="not-working-domains">
+        {% for item in results.not_working_domains %}
+        <li><strong>{{ item.domain }}</strong>: {{ item.reason }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No non-working domains found.</p>
+      {% endif %}
+    </div>
+    {% endif %}
   </div>
-  {%endblock%}
 </div>
+{% endblock %}

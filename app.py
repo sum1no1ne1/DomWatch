@@ -1,5 +1,6 @@
-from flask import Flask, render_template, redirect, request, url_for, flash
+from flask import Flask, render_template, redirect, request, url_for, flash,session
 from flask_scss import Scss
+from modules.config import supabase
 from modules.add_Domain import addDomain
 from modules.read_Domain import readDomain
 from modules.update_Domain import updateDomain
@@ -10,7 +11,8 @@ import os
 
 app = Flask(__name__)
 Scss(app)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your_secret_key")
+# app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your_secret_key")
+app.secret_key = 'your-secret-key-here'
 
 # --- Home ---
 @app.route("/")
@@ -60,16 +62,39 @@ def delete():
 @app.route("/fetch", methods=['GET','POST'])
 def fetch():
     if request.method == 'POST':
-        # Launch fetchDomain in a separate thread
-        thread = threading.Thread(target=fetchDomain)
-        thread.daemon = True  # ensures thread exits if server stops
-        thread.start()
-        flash("Domain verification started in background. You will receive an email when complete.")
+        try:
+            # Only run domain check when user clicks the button
+            fetchDomain()
+            flash("Domain verification completed successfully!", 'success')
+            # Store a flag in session to indicate processing is complete
+            session['processing_complete'] = True
+        except Exception as e:
+            flash(f"An error occurred: {str(e)}", 'error')
+        
         return redirect(url_for('fetch'))
-    return render_template('fetch.html')
-
+    
+    # Only show results if processing has been completed in this session
+    if session.get('processing_complete'):
+        working_result = supabase.table('Domain_table').select('domain_name').eq('is_valid', 'is working').execute()
+        working_domains = [d['domain_name'] for d in working_result.data]
+        
+        not_working_result = supabase.table('Domain_table').select('domain_name', 'verification_reason').eq('is_valid', 'not working').execute()
+        not_working_domains = [
+            {"domain": d['domain_name'], "reason": d.get('verification_reason', 'Unknown error')}
+            for d in not_working_result.data
+        ]
+        
+        results = {
+            "working_domains": working_domains,
+            "not_working_domains": not_working_domains
+        }
+    else:
+        results = None
+    
+    return render_template('fetch.html', results=results)
 # --- Main ---
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render sets PORT automatically
     app.run(host="0.0.0.0", port=port, debug=False)  # debug=False for production
+    # app.run(debug=True)
 

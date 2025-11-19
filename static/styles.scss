@@ -159,6 +159,34 @@ h1 {
         margin: 0 50px;
         font-size: 1.5rem;
     }
+    .results-section {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.working-domains, .not-working-domains {
+    list-style-type: none;
+    padding: 0;
+}
+
+.working-domains li, .not-working-domains li {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.not-working-domains li strong {
+    color: #d9534f; /* Bootstrap danger color */
+}
+
+.error-section {
+    color: #d9534f;
+    background-color: #f2dede;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
 }
 
 .links{

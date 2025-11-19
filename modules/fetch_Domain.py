@@ -3,8 +3,7 @@ import shutil
 from .config import supabase
 from .screenshot_utils import take_screenshot
 from .createpdf import pdfcreate
-from .sendmail import sendemail
-from .domain_utils import is_domain_valid_https
+from .domain_utils import is_domain_valid_https_with_reason
 
 def fetchDomain():
     try:
@@ -21,16 +20,22 @@ def fetchDomain():
             domain_name = entry['domain_name']
             print(f"Checking: {domain_name}")
 
-            if is_domain_valid_https(domain_name):
-                print(f"   - {domain_name} is valid.")
-                supabase.table('Domain_table').update({'is_valid': 'is working'}).eq('id', domain_id).execute()
+            is_valid, reason = is_domain_valid_https_with_reason(domain_name)
+            
+            if is_valid:
+                supabase.table('Domain_table').update({
+                    'is_valid': 'is working',
+                    'verification_reason': reason
+                }).eq('id', domain_id).execute()
             else:
-                print(f"   - {domain_name} is NOT valid.")
-                supabase.table('Domain_table').update({'is_valid': 'not working'}).eq('id', domain_id).execute()
+                supabase.table('Domain_table').update({
+                    'is_valid': 'not working',
+                    'verification_reason': reason
+                }).eq('id', domain_id).execute()
 
-        # Fetch working / not working domains
+        # Fetch working / not working domains with reasons
         working_domains = supabase.table('Domain_table').select('domain_name').eq('is_valid', 'is working').execute().data
-        not_working_domains = supabase.table('Domain_table').select('domain_name').eq('is_valid', 'not working').execute().data
+        not_working_domains = supabase.table('Domain_table').select('domain_name', 'verification_reason').eq('is_valid', 'not working').execute().data
 
         # Create screenshots folder
         folder_path = "screenshots"
@@ -48,14 +53,19 @@ def fetchDomain():
         pdf_result = pdfcreate()
         print(pdf_result)
 
-        # Send email with PDF and domain lists
-        email_result = sendemail(working_domains, not_working_domains)
-        print(email_result)
-
-        return "Domain verification, screenshot capture, PDF creation, and email sending completed successfully."
+        # Return the results
+        return {
+            "working_domains": [d['domain_name'] for d in working_domains],
+            "not_working_domains": [
+                {
+                    "domain": d['domain_name'], 
+                    "reason": d.get('verification_reason', 'Unknown error')
+                } 
+                for d in not_working_domains
+            ]
+        }
 
     except Exception as e:
         error_message = f"An error occurred during the fetch process: {e}"
         print(error_message)
-        return error_message
-
+        return {"error": error_message}

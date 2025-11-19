@@ -15,7 +15,25 @@ def get_chrome_driver():
 
     service = Service(os.environ.get("CHROMEDRIVER_PATH", "/usr/bin/chromedriver"))
     return webdriver.Chrome(service=service, options=chrome_options)
-
+   
+   
+    # chrome_options = Options()
+    
+    # # For local testing - remove render-specific options
+    # chrome_options.add_argument("--headless=new")  # Keep this for headless mode
+    # chrome_options.add_argument("--no-sandbox")
+    # chrome_options.add_argument("--disable-dev-shm-usage")
+    # chrome_options.add_argument("--disable-gpu")
+    # chrome_options.add_argument("--window-size=1920,1080")
+    
+    # Remove the render-specific binary location
+    # Let Selenium find Chrome automatically or specify local path
+    service = Service()  # This will look for chromedriver in PATH
+    
+    # Alternative: If you have chromedriver in a specific location locally:
+    # service = Service("/path/to/your/chromedriver")  # Update with your local path
+    
+    return webdriver.Chrome(service=service, options=chrome_options)
 def take_screenshot(domain):
     driver = get_chrome_driver()
     try:
