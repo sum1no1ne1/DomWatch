@@ -9,8 +9,7 @@ def fetchDomain():
     try:
         print("Starting domain verification process...")
 
-        # Get domains that are 'not verified'
-        result = supabase.table('Domain_table').select('id', 'domain_name').eq('is_valid', 'not verified').execute()
+        result = supabase.table('Domain_table').select('id', 'domain_name').execute()
         domains_to_check = result.data
         print(f"Found {len(domains_to_check)} domains to check.")
 
@@ -38,20 +37,20 @@ def fetchDomain():
         not_working_domains = supabase.table('Domain_table').select('domain_name', 'verification_reason').eq('is_valid', 'not working').execute().data
 
         # Create screenshots folder
-        folder_path = "screenshots"
-        if os.path.exists(folder_path):
-            shutil.rmtree(folder_path)
-        os.makedirs(folder_path, exist_ok=True)
+        # folder_path = "screenshots"
+        # if os.path.exists(folder_path):
+        #     shutil.rmtree(folder_path)
+        # os.makedirs(folder_path, exist_ok=True)
 
-        # Take screenshots for all working domains
-        print(f"Taking screenshots for {len(working_domains)} working domains...")
-        for entry in working_domains:
-            domain_name = entry['domain_name']
-            print(take_screenshot(domain_name))
+        # # Take screenshots for all working domains
+        # print(f"Taking screenshots for {len(working_domains)} working domains...")
+        # for entry in working_domains:
+        #     domain_name = entry['domain_name']
+        #     print(take_screenshot(domain_name))
 
-        # Create PDF from all screenshots
-        pdf_result = pdfcreate()
-        print(pdf_result)
+        # # Create PDF from all screenshots
+        # pdf_result = pdfcreate()
+        # print(pdf_result)
 
         # Return the results
         return {
