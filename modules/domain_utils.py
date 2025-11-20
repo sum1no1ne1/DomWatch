@@ -48,7 +48,7 @@ def is_domain_valid_https_with_reason(domain, max_redirects=5):
         # Manually follow redirects up to max_redirects
         while redirect_count <= max_redirects:
             try:
-                response = requests.get(current_url, timeout=10, allow_redirects=False)
+                response = requests.get(current_url, timeout=20, allow_redirects=False)
             except requests.exceptions.Timeout:
                 return False, "HTTP request timeout"
             except requests.exceptions.ConnectionError:
@@ -60,7 +60,7 @@ def is_domain_valid_https_with_reason(domain, max_redirects=5):
 
             if 200 <= status < 300:
                 # We've reached the final destination, now check if it's parked
-                final_response = requests.get(current_url, timeout=10)
+                final_response = requests.get(current_url, timeout=20)
                 
                 # Check final URL
                 final_url = final_response.url
