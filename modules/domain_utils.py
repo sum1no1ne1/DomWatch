@@ -52,7 +52,7 @@ def is_domain_valid_https_with_reason(domain, max_redirects=5):
             except requests.exceptions.Timeout:
                 return False, "HTTP request timeout"
             except requests.exceptions.ConnectionError:
-                return False, "Connection error"
+                return False, f"Connection error: {str(e)}"
             except requests.exceptions.RequestException as e:
                 return False, f"HTTP request error: {str(e)}"
                 
