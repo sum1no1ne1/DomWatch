@@ -10,10 +10,10 @@ PARKING_INDICATORS = [
     "sale", "auction", "marketplace", "website", "hosting", "name"
 ]
 
-def is_domain_valid_https_with_reason(domain, max_redirects=5):    
-    hostname = domain
-    port = 443
+def is_domain_valid_https_with_reason(domain, max_redirects=5):
+    hostname = domain.strip().lower()
     clean_hostname = hostname.replace('www.', '')
+    port = 443
 
     # SSL connection check
     try:
@@ -41,13 +41,17 @@ def is_domain_valid_https_with_reason(domain, max_redirects=5):
 
     # HTTP request check - follow redirects manually
     try:
-        url = f"https://{hostname}"
+        url = f"https://{clean_hostname}"  # Use clean_hostname for HTTP request
         redirect_count = 0
         current_url = url
+        headers = {"Accept": "*/*"}  # Prevent 406 errors
 
         while redirect_count <= max_redirects:
-            headers = {"Accept": "*/*"}  # Prevent 406 errors
             try:
+                response = requests.get(current_url, timeout=20, allow_redirects=False, headers=headers)
+            except requests.exceptions.SSLError:
+                # Retry without www if SSL fails
+                current_url = f"https://{clean_hostname}"
                 response = requests.get(current_url, timeout=20, allow_redirects=False, headers=headers)
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
                 return False, f"HTTP request failed: {str(e)}"
@@ -63,12 +67,12 @@ def is_domain_valid_https_with_reason(domain, max_redirects=5):
 
                 # Parking service check
                 parking_domains = [
-                    "sedoparking.com", "parkingcrew.net", "trafficjunky.net", 
+                    "sedoparking.com", "parkingcrew.net", "trafficjunky.net",
                     "sedo.com", "afternic.com", "park.io", "parked.com",
                     "domainmarket.com", "buydomains.com", "domainname.com",
                     "sedoleads.com", "parkingpage.name", "domainbroker.com"
                 ]
-                if any(parking_domain in final_domain for parking_domain in parking_domains):
+                if any(p in final_domain for p in parking_domains):
                     return False, "Redirects to domain parking service"
 
                 # Content check for parked phrases
@@ -83,8 +87,8 @@ def is_domain_valid_https_with_reason(domain, max_redirects=5):
                 if any(phrase in content for phrase in parking_phrases):
                     return False, "Domain appears to be parked"
 
-                # Check suspicious final domain
-                original_domain = hostname.lower()
+                # Check suspicious redirect
+                original_domain = clean_hostname
                 if final_domain != original_domain and not final_domain.endswith(original_domain):
                     return False, f"Redirected to different domain: {final_url}"
 
@@ -102,18 +106,15 @@ def is_domain_valid_https_with_reason(domain, max_redirects=5):
                 parsed_original = urlparse(current_url)
                 parsed_redirect = urlparse(redirect_url)
 
-                # Suspicious redirect checks
+                # Suspicious redirect check
                 if parsed_redirect.netloc and parsed_redirect.netloc != parsed_original.netloc:
                     for keyword in SUSPICIOUS_KEYWORDS:
                         if keyword in parsed_redirect.netloc.lower():
                             return False, f"Suspicious redirect to {redirect_url}"
 
                     redirect_lower = parsed_redirect.netloc.lower()
-                    parking_domains = [
-                        "sedoparking.com", "parkingcrew.net", "trafficjunky.net", 
-                        "sedo.com", "afternic.com", "park.io", "bit.ly", "tinyurl.com"
-                    ]
-                    if any(parking_domain in redirect_lower for parking_domain in parking_domains):
+                    if any(p in redirect_lower for p in ["sedoparking.com","parkingcrew.net","trafficjunky.net",
+                                                         "sedo.com","afternic.com","park.io","bit.ly","tinyurl.com"]):
                         return False, "Redirects to domain parking service"
 
                 if not parsed_redirect.scheme:
