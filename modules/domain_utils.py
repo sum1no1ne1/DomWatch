@@ -18,7 +18,7 @@ def is_domain_valid_https_with_reason(domain, max_redirects=5):
     # SSL connection check
     try:
         context = ssl.create_default_context()
-        with socket.create_connection((clean_hostname, port), timeout=10) as sock:
+        with socket.create_connection((clean_hostname, port), timeout=20) as sock:
             with context.wrap_socket(sock, server_hostname=clean_hostname) as ssock:
                 cert = ssock.getpeercert()
     except socket.gaierror:
